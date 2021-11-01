@@ -1,5 +1,5 @@
 <template>
-    <div class="weatherapp relative bg-green-500 text-white h-screen" >
+    <div class="weatherapp relative bg-green-500 text-white h-screen justify-content-center" >
       <div class=" flex justify-center " >
         <h1 class=" text-center mt-5 text-4xl  bg-gray-400  bg-opacity-25 p-4 rounded  text-green-100 "  >   Weather App</h1>
       </div>
@@ -14,6 +14,7 @@
         
         <div v-if="loading" >
           <Spin />
+          Loading
          
         </div>
           <div v-if="detail.cod == 404  " class="mt-3" >
@@ -37,12 +38,24 @@
            
        
       </div>
-      
-      <div  class="absolute bottom-5 inset-x-0  flex justify-center" >
-        <p class="text-center " > ichbinsieger </p>
-        <div class="ml-3 mt-1" >  <a href="https://github.com/ichbinsieger" class="mr-2" > <ion-icon name="logo-github"></ion-icon> </a>  <a href="https://twitter.com/ichbinsieger"><ion-icon name="logo-twitter"></ion-icon></a> </div>
+      <!-- <h5 class = "text-center" v-if = "this.forecast_details != undefined">7 days Forecast</h5> -->
+       <div class = "row justify-center text-center  items-center">
+        <div class= "col flex">
+            <div class="card border border-dark rounded m-4 animate__animated animate__zoomIn animate__delay-0s"   v-for = "(item) in forecast_details.daily" :key="item" style="width: 18rem; border-radius: 5%">
+                <div class="card-body border-rounded text-dark">
+                  <h4 class="card-title text-3xl text-center">{{ Math.round(item.temp.day -273.15) }} <span>°C</span></h4>
+                  <h4 class="mt-2 text-center" >  {{ item.weather[0].main }} </h4>
+                  <img src="http://openweathermap.org/img/wn/10d@2x.png" class="animate__animated animate__flip animate__delay-1s center" alt="">  
+                  <h5 class= "text-center">{{timeConverter(item.dt) }}</h5>
+                  <h3  > {{ detail.name}},  {{ detail.sys.country }} </h3>
+                </div>
+        </div>
+        
       </div>
-     </div>
+      
+    </div>
+    </div>
+   
 
      
        
@@ -58,16 +71,23 @@ export default {
   
   data(){
      return{
-       location: "lagos,Nigeria",
-       api_key: "550d972c6e25316a8a59ad0f07c6c237",
+       api_key: "db225a9416a485c121752c8f2876d298",
        base_url: "https://api.openweathermap.org/data/2.5/",
        query: "",
        detail: {},
        url: '',
-       loading: false
-       
+       loading: false,
+       forecast_details: {},
+       is_data_fetched: false,
        
      }
+  },
+  updated(){
+    if(this.is_data_fetched){
+        setTimeout(() =>  { fetch( `https://api.openweathermap.org/data/2.5/onecall?lat=${this.detail.coord.lat}&lon=${this.detail.coord.lon}&appid=db225a9416a485c121752c8f2876d298` ).then(response => response.json()).then( this.forecast_result ) 
+                 } , 1000);
+                 this.is_data_fetched =false
+    }
   },
   methods:{
      
@@ -75,13 +95,8 @@ export default {
            if ( e.key == "Enter"  ) {
              this.loading  = true;
                  setTimeout( () => { this.loading = false } , 1000);
-                 setTimeout(() =>  { fetch( `${this.base_url}weather?q=${this.query}&units=metric&appid=${this.api_key}`).then(response => response.json()).then( this.results) } , 1000);
-                 
-                 
-                  
-
-           
-
+                 setTimeout(() =>  { fetch( `${this.base_url}weather?q=${this.query}&units=metric&appid=${this.api_key}`).then(response => response.json()).then( this.results) 
+                 } , 1000);
            }
             
       },
@@ -89,13 +104,35 @@ export default {
           
               this.loading  = true;
                  setTimeout( () => { this.loading = false } , 1000);
-                 setTimeout(() =>  { fetch( `${this.base_url}weather?q=${this.query}&units=metric&appid=${this.api_key}`).then(response => response.json()).then( this.results) } , 1000);
+                 setTimeout(() =>  { fetch( `${this.base_url}weather?q=${this.query}&units=metric&appid=${this.api_key}`).then(response => response.json()).then( this.results) 
+                } , 1000);
                  
+                // 'https://api.openweathermap.org/data/2.5/onecall?lat=31.5287&lon=74.3504&appid=db225a9416a485c121752c8f2876d298' 
+                //  api.openweathermap.org/data/2.5/forecast/daily?q=London&units=metric&cnt=7&appid={API key}
       },
       results(result){
-          this.detail =  result
-         this.url = `http://openweathermap.org/img/wn/${this.detail.weather[0].icon}@2x.png`
+        
+        this.detail =  result
+        this.is_data_fetched =true;
+        //this.url = `http://openweathermap.org/img/wn/${this.detail.weather[0].icon}@2x.png`
+        console.log(JSON.parse(JSON.stringify(this.detail)))
+                 console.log("This is loading details attribute")
+
        },
+       forecast_result(result) {
+         this.forecast_details = result
+         console.log|("In forecast details method")
+         console.log(JSON.parse(JSON.stringify(this.forecast_details)))
+       },
+       timeConverter(UNIX_timestamp){
+          var a = new Date(UNIX_timestamp * 1000);
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          var year = a.getFullYear();
+          var month = months[a.getMonth()];
+          var date = a.getDate();
+          var time = date + ' ' + month + ' ' + year;
+          return time;
+        }
        
      
       
@@ -105,7 +142,7 @@ export default {
      
   },
  components:{
-   Spin,
+    Spin,
  }
 
 }
@@ -116,6 +153,12 @@ export default {
 
 .weatherapp{
   font-family: 'Montserrat', sans-serif;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
 }
 
 </style>

@@ -139,7 +139,7 @@ export default {
       city_info: {
         name: '',
         country: '',
-        longiude: '',
+        longitude: '',
         latitude: '',
       },
     };
@@ -180,7 +180,7 @@ export default {
       setTimeout(() => {
         this.loading = false;
       }, 1000);
-      if (this.$store.getters.getCities.find((e) => e == this.query)) {
+      if (this.$store.getters.getCities.find((e) => e.name == this.query)) {
         console.log('Match Found in City array, loading data from store:');
         let forecast = this.$store.getters.getForecatsDetails.find(
           (e) => e.title.city == this.query
@@ -271,13 +271,15 @@ export default {
       return to_set;
     },
     getCity(city) {
-      return city == this.query;
+      return city.name == this.query;
     },
     async addCity() {
       if (!this.$store.getters.getCities.find(this.getCity)) {
-        const response = await weatherAPI.addCity(this.forecast_details);
+        const response = await weatherAPI.addForecast(this.forecast_details);
+        const response2 = await weatherAPI.addCity(this.city_info);
         console.log('this was returned', response);
-        this.$store.commit('setCity', this.query);
+        console.log('city was added as:', response2);
+        this.$store.commit('setCity', this.city_info);
         this.$store.commit('setForecast_details', this.forecast_details);
       }
     },

@@ -10,5 +10,5 @@ cd dist
 git init
 git add -A
 git commit -m 'deploy'
-git push -f git@github.com:faysaljafry/vue_weather.git master:gh-pages
+git push -f git@github.com:faysaljafry/vue_weather_pwa.git master:gh-pages
 cd -

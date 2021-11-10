@@ -15,41 +15,29 @@ export const store = createStore({
   },
   getters: {
     getCities(state) {
-      return state.cities;
+      return JSON.parse(JSON.stringify(state.cities));
     },
     getForecatsDetails(state) {
-      return state.forecast_details;
+      return JSON.parse(JSON.stringify(state.forecast_details));
     },
   },
   mutations: {
     async getWeatherData(state) {
       console.log('In the Mutation for getWeatherdata');
-      const response = await weatherAPI.fecthweatherData();
-      const cityRes = await weatherAPI.getCitiesData();
-      let cities = response.data;
-      let city_details = cityRes.data;
-      console.log('returned Records Combined', cities);
-      // let index = 0;
-      // let available_cities = [];
-      // for (index; index < cities.length; index++) {
-      //   //console.log('Running loop for times', cities[index].title.city);
-      //   available_cities.push(city_details[index]);
-      //   state.forecast_details = JSON.parse(JSON.stringify(cities));
-      // }
-      for (let city in city_details) {
-        state.cities.push(city_details[city].title);
-      }
-      console.log(state.cities);
-      // state.cities = city_details;
-      console.log('Cities in store: ', state.cities);
-      state.forecast_details = JSON.parse(JSON.stringify(cities));
-      // state.cities = available_cities;
+      const FC_details = await weatherAPI.fecthweatherData();
+      const city_Details = await weatherAPI.getCitiesData();
+      // state.forecast_details = JSON.parse(JSON.stringify(FC_details.data));
+      //state.cities = JSON.parse(JSON.stringify(city_Details.data));
+      city_Details.data.forEach((obj) => state.cities.push(obj.title));
+      FC_details.data.forEach((obj) => state.forecast_details.push(obj.title));
+      console.log(JSON.parse(JSON.stringify(state.cities)));
     },
     setCity(state, city) {
-      state.cities.push(city);
-      console.log('Sett city with added details are: ', state.cities);
+      //console.log('passed city is : ', city);
+      state.cities.push({ ...city });
     },
     setForecast_details(state, data) {
+      //console.log('passed city is : ', data);
       state.forecast_details.push(data);
     },
   },

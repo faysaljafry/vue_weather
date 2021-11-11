@@ -1,13 +1,14 @@
 import { createApp } from 'vue';
-import router from './router';
+//import { Vue } from 'vue';
 import App from './App.vue';
 import { store } from './store';
-import './registerServiceWorker';
-import ShowHourly from './components/ShowHourly.vue';
+import router from './router';
+// import wb from './registerServiceWorker';
 <script type='text/javascript' src='./assets/pakistan.json'></script>;
 
 const app = createApp(App);
-app.component('ShowHourly', ShowHourly);
+//app.prototype.$workbox = wb;
+// Vue.prototype.$workbox = wb;
 app.use(store);
 app.use(router);
 app.mount('#app');

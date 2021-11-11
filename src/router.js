@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import ShowHourly from './components/ShowHourly.vue';
+import home from './components/home.vue'
+import { def } from '@vue/shared';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -8,8 +10,18 @@ const router = createRouter({
       path: '/showHourly',
       name: 'ShowHourly',
       component: ShowHourly,
-      props: { city_info: true },
+      props: true,
     },
+    {
+      path: '/home',
+      name: home ,
+      component: home
+    },
+    {
+      path:'/',
+      name : def,
+      component: home
+    }
   ],
 });
 export default router;

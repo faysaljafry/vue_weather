@@ -12,6 +12,7 @@ export const store = createStore({
     cities: [],
     forecast_details: [],
     api_key: 'db225a9416a485c121752c8f2876d298',
+    hourly_details_to_show : []
   },
   getters: {
     getCities(state) {
@@ -20,6 +21,9 @@ export const store = createStore({
     getForecatsDetails(state) {
       return JSON.parse(JSON.stringify(state.forecast_details));
     },
+    getHourlyDetailstoShow(state){
+      return JSON.parse(JSON.stringify(state.hourly_details_to_show))
+    }
   },
   mutations: {
     async getWeatherData(state) {
@@ -40,5 +44,9 @@ export const store = createStore({
       //console.log('passed city is : ', data);
       state.forecast_details.push(data);
     },
+    setHourlydetails(state, hourlydata){
+      state.hourly_details_to_show = hourlydata
+      console.log("Hourlydetails are set as:", state.hourly_details_to_show )
+    }
   },
 });

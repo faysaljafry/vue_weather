@@ -41,12 +41,15 @@
         </button>
       </div>
 
-      <div v-if="loading">
+      <div v-if="loading == true">
         <Spin />
         Loading
       </div>
 
-      <div v-if="loading == false" class="flex justify-center">
+      <div
+        v-if="loading == false || checked == true"
+        class="flex justify-center"
+      >
         <div
           v-if="this.detail.weather != undefined"
           class="w-52 animate__animated animate__zoomIn animate__delay-0s"
@@ -76,42 +79,53 @@
     >
       7 days Forecast
     </div>
-    <router-link v-if="this.loading == false" to="ShowHourly">
-      <div>
+
+    <div>
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 sm:gap-2 gap-4 justify-items-center"
+        v-if="this.loading == false"
+      >
         <div
-          class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 sm:gap-2 gap-4 justify-items-center"
-          v-if="this.loading == false"
+          id="card"
+          class="w-40 sm:w-44 items-center animate-none rounded animate__animated animate__zoomIn animate__delay-0s bg-gray-500 "
+          v-for="item in forecast_details.daily"
+          :key="item"
         >
           <div
-            id="card"
-            class="w-40 sm:w-44 items-center animate-none rounded animate__animated animate__zoomIn animate__delay-0s bg-gray-500 "
-            v-for="item in forecast_details.daily"
-            :key="item"
+            class="rounded text-dark hover:border-transparent items-center justify-center transition-shadow shadow-2xl"
           >
-            <div
-              class="rounded text-dark hover:border-transparent items-center transition-shadow shadow-2xl"
-            >
-              <h4 class="text-black text-3xl text-center">
-                {{ Math.floor(item.temp.day - 273.15) }} <span>°C</span>
-              </h4>
-              <h4 class="mt-2 text-center">{{ item.weather[0].main }}</h4>
-              <img
-                id="icon"
-                v-bind:src="showIcon(item.weather[0].icon)"
-                class="animate__animated animate__flip animate__delay-1s center"
-                alt=""
-              />
-              <h5 class="text-center text-white">
-                {{ timeConverter(item.dt) }}
-              </h5>
-              <h3 class="text-center text-white">
-                {{ city_info.name }}, {{ city_info.country }}
-              </h3>
+            <h4 class="text-black text-3xl text-center">
+              {{ Math.floor(item.temp.day - 273.15) }} <span>°C</span>
+            </h4>
+            <h4 class="mt-2 text-center">{{ item.weather[0].main }}</h4>
+            <img
+              id="icon"
+              v-bind:src="showIcon(item.weather[0].icon)"
+              class="animate__animated animate__flip animate__delay-1s center"
+              alt=""
+            />
+            <h5 class="text-center text-white">
+              {{ timeConverter(item.dt, false) }}
+            </h5>
+            <h3 class="text-center text-white">
+              {{ city_info.name }}, {{ city_info.country }}
+            </h3>
+            <div class="text-center">
+              <router-link :to="'/showHourly/' + timeConverter(item.dt, true)">
+                <button
+                  :disabled="
+                    !(timeConverter(item.dt, true) <= new Date().getDate() + 1)
+                  "
+                  class="bg-gray-800 hover:bg-gray-300 text-white hover:text-gray-900 font-bold py-2 justify-items-center px-4 my-2 rounded-full"
+                >
+                  Hourly data
+                </button>
+              </router-link>
             </div>
           </div>
         </div>
       </div>
-    </router-link>
+    </div>
   </div>
 </template>
 
@@ -144,10 +158,7 @@ export default {
       },
     };
   },
-  beforeCreate() {
-    this.$store.replaceState({ cities: [], forecast_details: [] });
-    this.$store.commit('getWeatherData');
-  },
+
   created() {
     let _city = require('../assets/pakistan.json');
     this.cities_of_country = _city;
@@ -155,6 +166,14 @@ export default {
       this.$workbox.addEventListener('waiting', () => {
         this.showUpgradeUI = true;
       });
+    }
+    if (this.$store.getters.getLastSearched) {
+      console.log(
+        'Getting last searhed as :',
+        this.$store.getters.getLastSearched
+      );
+      this.query = this.$store.getters.getLastSearched;
+      this.searchClick();
     }
   },
   updated() {},
@@ -181,6 +200,7 @@ export default {
     },
     searchClick() {
       this.loading = true;
+      this.$store.checked = true;
       setTimeout(() => {
         this.loading = false;
       }, 1000);
@@ -193,7 +213,14 @@ export default {
         this.getlocation(this.query);
         this.results(forecast.hourly);
         this.forecast_result(forecast);
+        console.log('returned from forecast result');
+        this.forecast_details.hourly.forEach((obj) => {
+          console.log('In loop');
+          let day = this.setDate(obj.dt);
+          obj.date = day;
+        });
         this.$store.commit('setHourlydetails', forecast.hourly);
+        this.$store.commit('setLastSearched', this.query);
       } else {
         console.log('Not found in the store, sending request to WeatherAPI');
         this.getlocation(this.query);
@@ -208,9 +235,15 @@ export default {
               this.forecast_result(result);
               this.addCity(JSON.parse(JSON.stringify(result)));
               this.$store.commit('setHourlydetails', result.hourly);
+              this.$store.commit('setLastSearched', this.query);
             });
         }, 1000);
       }
+    },
+    setDate(UNIX_timestamp) {
+      var a = new Date(UNIX_timestamp * 1000);
+      console.log(a.getDate());
+      return a.getDate();
     },
     getlocation(city) {
       //console.log('In city info Function...', city);
@@ -244,7 +277,7 @@ export default {
       this.forecast_details.city = this.query;
       //API Request to MOngo
     },
-    timeConverter(UNIX_timestamp) {
+    timeConverter(UNIX_timestamp, route_call) {
       var a = new Date(UNIX_timestamp * 1000);
       var months = [
         'Jan',
@@ -263,7 +296,10 @@ export default {
       var year = a.getFullYear();
       var month = months[a.getMonth()];
       var date = a.getDate();
-
+      if (route_call == true) {
+        console.log(date <= new Date().getDate() + 1);
+        return date;
+      }
       var time = date + ' ' + month + ' ' + year;
       return time;
     },

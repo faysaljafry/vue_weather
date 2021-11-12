@@ -10,5 +10,9 @@
 
 export default {
   name: 'App',
+  beforeCreate() {
+    this.$store.replaceState({ cities: [], forecast_details: [] });
+    this.$store.commit('getWeatherData');
+  },
 };
 </script>

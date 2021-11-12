@@ -12,7 +12,9 @@ export const store = createStore({
     cities: [],
     forecast_details: [],
     api_key: 'db225a9416a485c121752c8f2876d298',
-    hourly_details_to_show : []
+    hourly_details_to_show: [],
+    checked: false,
+    last_searched: '',
   },
   getters: {
     getCities(state) {
@@ -21,9 +23,12 @@ export const store = createStore({
     getForecatsDetails(state) {
       return JSON.parse(JSON.stringify(state.forecast_details));
     },
-    getHourlyDetailstoShow(state){
-      return JSON.parse(JSON.stringify(state.hourly_details_to_show))
-    }
+    getHourlyDetailstoShow(state) {
+      return JSON.parse(JSON.stringify(state.hourly_details_to_show));
+    },
+    getLastSearched(state) {
+      return state.last_searched;
+    },
   },
   mutations: {
     async getWeatherData(state) {
@@ -44,9 +49,13 @@ export const store = createStore({
       //console.log('passed city is : ', data);
       state.forecast_details.push(data);
     },
-    setHourlydetails(state, hourlydata){
-      state.hourly_details_to_show = hourlydata
-      console.log("Hourlydetails are set as:", state.hourly_details_to_show )
-    }
+    setHourlydetails(state, hourlydata) {
+      state.hourly_details_to_show = hourlydata;
+      console.log('Hourlydetails are set as:', state.hourly_details_to_show);
+    },
+    setLastSearched(state, city) {
+      console.log('Setting last searched as', city);
+      state.last_searched = city;
+    },
   },
 });

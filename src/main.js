@@ -9,6 +9,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons';
+import VueSocialSharing from 'vue-social-sharing';
 // import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(faUserSecret);
@@ -21,3 +22,4 @@ app.use(router);
 app.mount('#app');
 AOS.init();
 app.use(AOS);
+app.use(VueSocialSharing);

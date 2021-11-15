@@ -3,6 +3,13 @@
     class="weatherapp relative text-grey-400 justify-content-center"
     style="height:100%"
   >
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css"
+      integrity="sha256-h20CPZ0QyXlBuAw7A+KluUYx/3pK+c7lYEpqLTlxjYQ="
+      crossorigin="anonymous"
+    />
+
     <div class="drop-shadow-lg flex flex-row justify-center">
       <img src="../assets/cloud.png" />
       <h5
@@ -77,12 +84,12 @@
       class="text-center text-3xl mt-5 mb-5 animate-pulse"
       v-if="this.loading == false"
     >
-      7 days Forecast
+      <p>7 days Forecast</p>
     </div>
 
     <div>
       <div
-        class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 sm:gap-2 gap-4 justify-items-center"
+        class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 sm:gap-2 gap-4 mb-2   justify-items-center"
         v-if="this.loading == false"
       >
         <div
@@ -121,6 +128,45 @@
                   Hourly data
                 </button>
               </router-link>
+              <div>
+                <ShareNetwork
+                  class="mx-2"
+                  @open="open"
+                  network="facebook"
+                  url="https://vueweather-pwa.herokuapp.com"
+                  title="Weather at Lahore for today"
+                  description="Find Daily and Hourly forecast data of weather in your city"
+                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                  hashtags="vuejs,vite"
+                >
+                  <i class="fab fa-facebook text-white hover:text-blue-600"></i>
+                </ShareNetwork>
+
+                <ShareNetwork
+                  @open="open"
+                  class="mx-2"
+                  network="linkedin"
+                  url="https://vueweather-pwa.herokuapp.com"
+                  title="Weather at Lahore for Today"
+                  description="Find Daily and Hourly forecast data of weather in your city"
+                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                  hashtags="vuejs,vite"
+                >
+                  <i class="fab fa-linkedin text-white hover:text-blue-500"></i>
+                </ShareNetwork>
+                <ShareNetwork
+                  @open="open"
+                  class="mx-2"
+                  network="twitter"
+                  url="https://vueweather-pwa.herokuapp.com"
+                  title="Weather at Lahore for Today"
+                  description="Find Daily and Hourly forecast data of weather in your city"
+                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                  hashtags="vuejs,vite"
+                >
+                  <i class="fab fa-twitter text-white hover:text-blue-500"></i>
+                </ShareNetwork>
+              </div>
             </div>
           </div>
         </div>
@@ -237,7 +283,7 @@ export default {
               this.$store.commit('setHourlydetails', result.hourly);
               this.$store.commit('setLastSearched', this.query);
             });
-        }, 1000);
+        }, 250);
       }
     },
     setDate(UNIX_timestamp) {
@@ -353,6 +399,9 @@ export default {
       );
       //this.$router.push('/showHourly');
     },
+    open() {
+      console.log('This event is fired...');
+    },
   },
   components: {
     Spin,
@@ -372,19 +421,6 @@ export default {
   margin-left: auto;
   margin-right: auto;
   /* width: 50%; */
-}
-body {
-  background: #83a4d4; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #b6fbff,
-    #83a4d4
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #b6fbff,
-    #83a4d4
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 #card {
   background: #e6dada; /* fallback for old browsers */
